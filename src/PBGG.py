@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
 import time
+from A_Star_Algorithm import AStar
 
 def LoadMap2Tensor(filename):
     '''
@@ -24,6 +25,13 @@ def LoadMap2Tensor(filename):
     return map_tensor
 
 def PatternMatch(X, Kernel, bias, conv):
+    '''
+    :param X:
+    :param Kernel:
+    :param bias:
+    :param conv:
+    :return:
+    '''
     device = 'cuda'
     X = X.to(device)
     Kernel = Kernel.to(device)
@@ -226,12 +234,22 @@ def drawPicture(img, filename, start, target):
     plt.show()
     plt.close()
 
+def transform_map(map):
+    '''
+    :param map:
+    :return: grid
+    '''
+    grid[grid == 1] = 0     # 所有为1的部分转化为0
+    grid[grid == -1] = 1    # 所有为-1的元素转换为1
+    return grid
+
+
 if __name__ == "__main__":
     filename = "../map_txt/maze512-4-4_copy.txt"
     MapTensor = LoadMap2Tensor(filename)
     torch.cuda.device('cuda')
-    start = [480, 98]
-    target = [442, 63]
+    start = (488, 448)
+    target = (160, 443)
     maxIter = (MapTensor.shape[1] + MapTensor.shape[2]) // 8
     kernel4N, bias4N = init_4N_kernels()
     drawPicture(MapTensor, "maze512-4-4_copy", start, target)
@@ -247,3 +265,14 @@ if __name__ == "__main__":
     time2 = time.time()
     print("PBGG 8N:", time2-time1, " ms")
     drawPicture(M, "maze512-4-4_copy_after_8N", start, target)
+
+    grid = torch.squeeze(MapTensor).cpu().numpy()
+    grid = transform_map(grid)
+    print(grid)
+
+    astar = AStar(grid)
+    time1 = time.time()
+    path = astar.search(start, target)
+    time2 = time.time()
+    print("astar:", time2 - time1, " ms")
+    print("path: ", path)
