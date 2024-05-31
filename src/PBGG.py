@@ -256,14 +256,14 @@ if __name__ == "__main__":
     time1 = time.time()
     M = PBGG4N(MapTensor, start, target, maxIter, kernel4N, bias4N)
     time2 = time.time()
-    print("PBGG 4N: ", time2-time1, " ms")
+    print("PBGG 4N: ", time2-time1, " s")
     drawPicture(M, "maze512-4-4_copy_after_4N", start, target)
 
     kernel8N, bias8N = init_8N_kernels()
     time1 = time.time()
     M = PBGG8N(MapTensor, start, target, maxIter, kernel8N, bias8N)
     time2 = time.time()
-    print("PBGG 8N:", time2-time1, " ms")
+    print("PBGG 8N:", time2-time1, " s")
     drawPicture(M, "maze512-4-4_copy_after_8N", start, target)
 
     grid = torch.squeeze(MapTensor).cpu().numpy()
